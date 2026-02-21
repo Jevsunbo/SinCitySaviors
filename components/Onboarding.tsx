@@ -193,32 +193,30 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
               </p>
             </div>
 
-            {/* Budget & time for returning users */}
-            {isReturning && (
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="mb-1.5 block text-sm font-medium text-zinc-300">Budget ($)</label>
-                  <input
-                    type="number"
-                    value={data.budgetLimit}
-                    onChange={(e) => update("budgetLimit", Number(e.target.value))}
-                    min={50}
-                    className="w-full rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-white focus:border-indigo-500 focus:outline-none transition"
-                  />
-                </div>
-                <div>
-                  <label className="mb-1.5 block text-sm font-medium text-zinc-300">Time limit (min)</label>
-                  <input
-                    type="number"
-                    value={data.timeLimit}
-                    onChange={(e) => update("timeLimit", Number(e.target.value))}
-                    min={30}
-                    max={480}
-                    className="w-full rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-white focus:border-indigo-500 focus:outline-none transition"
-                  />
-                </div>
+            {/* Budget & time */}
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-zinc-300">Budget ($)</label>
+                <input
+                  type="number"
+                  value={data.budgetLimit}
+                  onChange={(e) => update("budgetLimit", Number(e.target.value))}
+                  min={50}
+                  className="w-full rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-white focus:border-indigo-500 focus:outline-none transition"
+                />
               </div>
-            )}
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-zinc-300">Time limit (min)</label>
+                <input
+                  type="number"
+                  value={data.timeLimit}
+                  onChange={(e) => update("timeLimit", Number(e.target.value))}
+                  min={30}
+                  max={480}
+                  className="w-full rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-white focus:border-indigo-500 focus:outline-none transition"
+                />
+              </div>
+            </div>
 
             {/* Mood */}
             <div>
