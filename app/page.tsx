@@ -1,5 +1,6 @@
 import Link from "next/link";
 import UserAvatar from "@/components/UserAvatar";
+import StartSessionButton from "@/components/StartSessionButton";
 
 export default function LandingPage() {
   return (
@@ -42,12 +43,9 @@ export default function LandingPage() {
           </p>
 
           <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-            <Link
-              href="/dashboard"
-              className="rounded-full bg-indigo-600 px-10 py-4 font-semibold hover:bg-indigo-500 transition text-lg shadow-lg shadow-indigo-600/30"
-            >
+            <StartSessionButton className="rounded-full bg-indigo-600 px-10 py-4 font-semibold hover:bg-indigo-500 transition text-lg shadow-lg shadow-indigo-600/30">
               Start your session →
-            </Link>
+            </StartSessionButton>
             <a
               href="#how-it-works"
               className="rounded-full border border-zinc-700 px-10 py-4 font-semibold text-zinc-400 hover:border-zinc-500 hover:text-white transition text-lg"
@@ -212,12 +210,9 @@ export default function LandingPage() {
             No sign-up required. Start a session and Ace will be watching out for you from the first bet.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link
-              href="/dashboard"
-              className="rounded-full bg-indigo-600 px-10 py-4 font-semibold hover:bg-indigo-500 transition shadow-lg shadow-indigo-600/30"
-            >
+            <StartSessionButton className="rounded-full bg-indigo-600 px-10 py-4 font-semibold hover:bg-indigo-500 transition shadow-lg shadow-indigo-600/30">
               Start your session →
-            </Link>
+            </StartSessionButton>
             <Link
               href="/sign-in"
               className="rounded-full border border-zinc-700 px-10 py-4 font-semibold text-zinc-400 hover:border-zinc-500 hover:text-white transition"
