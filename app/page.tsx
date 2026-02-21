@@ -1,5 +1,4 @@
 import Link from "next/link";
-import ScrollPopup from "@/components/ScrollPopup";
 import UserAvatar from "@/components/UserAvatar";
 
 export default function LandingPage() {
@@ -231,8 +230,6 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-
-      <ScrollPopup />
 
       {/* Footer */}
       <footer className="border-t border-zinc-800/60 py-8">
