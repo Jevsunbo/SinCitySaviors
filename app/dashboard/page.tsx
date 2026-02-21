@@ -5,6 +5,7 @@ import Dashboard from "@/components/Dashboard";
 import AceChat from "@/components/AceChat";
 import Onboarding from "@/components/Onboarding";
 import SessionSummary from "@/components/SessionSummary";
+import ActivityCards from "@/components/ActivityCards";
 import { calculateRisk, MentalHealthProfile, RiskResult, SessionData } from "@/lib/riskEngine";
 import { createMockSession } from "@/lib/mockSession";
 
@@ -93,7 +94,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Two-column layout on larger screens */}
-        <div className="grid gap-6 lg:grid-cols-5">
+        <div className="grid gap-6 lg:grid-cols-5 lg:items-stretch">
           {/* Chart takes more space */}
           <div className="lg:col-span-3">
             <Dashboard
@@ -104,24 +105,27 @@ export default function DashboardPage() {
           </div>
 
           {/* Ace sidebar */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 flex flex-col gap-4">
             <AceChat risk={risk} />
-          </div>
-        </div>
+            <ActivityCards risk={risk} onAccept={() => setUserAccepted(true)} />
 
-        {/* Active triggers */}
-        {risk.triggers.length > 0 && (
-          <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-4">
-            <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-zinc-500">
-              Active Signals
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {risk.triggers.map((t) => (
-                <TriggerPill key={t} trigger={t} />
-              ))}
+            {/* Active triggers — pushes to bottom of column */}
+            <div className="mt-auto">
+              {risk.triggers.length > 0 && (
+                <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-4">
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-zinc-500">
+                    Active Signals
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {risk.triggers.map((t) => (
+                      <TriggerPill key={t} trigger={t} />
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
-        )}
+        </div>
       </main>
     </div>
   );
