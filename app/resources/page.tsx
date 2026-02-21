@@ -134,14 +134,9 @@ export default function ResourcesPage() {
               </li>
             ))}
           </ul>
-          <a
-            href="https://www.ncpgambling.org/help-treatment/self-assessment/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-sm text-indigo-400 hover:text-indigo-300 transition"
-          >
-            Take the full assessment →
-          </a>
+          <p className="text-xs text-zinc-500">
+            If you answered yes to 2 or more, consider calling the helpline above.
+          </p>
         </div>
 
         {/* Resource cards */}
