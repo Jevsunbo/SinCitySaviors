@@ -24,6 +24,7 @@ interface ChartPoint {
 
 interface DashboardProps {
   onRiskUpdate: (risk: RiskResult) => void;
+  onEndSession: (session: SessionData) => void;
   mentalHealth?: MentalHealthProfile | null;
 }
 
@@ -83,7 +84,7 @@ function RiskMeter({ score, level }: { score: number; level: RiskResult["level"]
   );
 }
 
-export default function Dashboard({ onRiskUpdate, mentalHealth }: DashboardProps) {
+export default function Dashboard({ onRiskUpdate, onEndSession, mentalHealth }: DashboardProps) {
   const [mode, setMode] = useState<ScenarioMode>("normal");
   const [session, setSession] = useState<SessionData>(() =>
     createMockSession("normal")
@@ -152,6 +153,13 @@ export default function Dashboard({ onRiskUpdate, mentalHealth }: DashboardProps
             className="rounded-lg border border-zinc-700 px-3 py-1.5 text-sm text-zinc-300 hover:bg-zinc-800 transition"
           >
             Reset
+          </button>
+          <button
+            onClick={() => { setIsRunning(false); onEndSession(session); }}
+            disabled={session.bets.length === 0}
+            className="rounded-lg border border-red-700 px-3 py-1.5 text-sm text-red-400 hover:bg-red-900/30 transition disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            End Session
           </button>
           <button
             onClick={() => setIsRunning((r) => !r)}

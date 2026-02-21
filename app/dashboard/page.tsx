@@ -4,7 +4,8 @@ import { useState } from "react";
 import Dashboard from "@/components/Dashboard";
 import AceChat from "@/components/AceChat";
 import Onboarding from "@/components/Onboarding";
-import { calculateRisk, MentalHealthProfile, RiskResult } from "@/lib/riskEngine";
+import SessionSummary from "@/components/SessionSummary";
+import { calculateRisk, MentalHealthProfile, RiskResult, SessionData } from "@/lib/riskEngine";
 import { createMockSession } from "@/lib/mockSession";
 
 const DEFAULT_RISK: RiskResult = calculateRisk(createMockSession("normal"));
@@ -12,10 +13,44 @@ const DEFAULT_RISK: RiskResult = calculateRisk(createMockSession("normal"));
 export default function DashboardPage() {
   const [risk, setRisk] = useState<RiskResult>(DEFAULT_RISK);
   const [mentalHealth, setMentalHealth] = useState<MentalHealthProfile | null>(null);
+  const [endedSession, setEndedSession] = useState<SessionData | null>(null);
+  const [aceTriggered, setAceTriggered] = useState(false);
+  const [userAccepted, setUserAccepted] = useState(false);
 
   // Show onboarding until completed
   if (!mentalHealth) {
     return <Onboarding onComplete={setMentalHealth} />;
+  }
+
+  // Show session summary when session ends
+  if (endedSession) {
+    const wins = endedSession.bets.filter((b) => b.outcome === "win").length;
+    const losses = endedSession.bets.filter((b) => b.outcome === "loss").length;
+    const amountSpent = endedSession.initialBankroll - endedSession.currentBankroll;
+    const durationMinutes = Math.round((Date.now() - endedSession.startTime) / 60000);
+
+    return (
+      <SessionSummary
+        stats={{
+          totalBets: endedSession.bets.length,
+          wins,
+          losses,
+          amountSpent: Math.max(0, amountSpent),
+          initialBankroll: endedSession.initialBankroll,
+          peakRiskScore: risk.score,
+          durationMinutes,
+          aceTriggered,
+          userAccepted,
+        }}
+        onPlayAgain={() => {
+          setEndedSession(null);
+          setMentalHealth(null);
+          setAceTriggered(false);
+          setUserAccepted(false);
+          setRisk(DEFAULT_RISK);
+        }}
+      />
+    );
   }
 
   return (
@@ -61,7 +96,11 @@ export default function DashboardPage() {
         <div className="grid gap-6 lg:grid-cols-5">
           {/* Chart takes more space */}
           <div className="lg:col-span-3">
-            <Dashboard onRiskUpdate={setRisk} mentalHealth={mentalHealth} />
+            <Dashboard
+              onRiskUpdate={setRisk}
+              onEndSession={setEndedSession}
+              mentalHealth={mentalHealth}
+            />
           </div>
 
           {/* Ace sidebar */}
