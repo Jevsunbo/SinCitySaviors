@@ -1,4 +1,4 @@
-import { openai } from "@ai-sdk/openai";
+import { anthropic } from "@ai-sdk/anthropic";
 import { streamText } from "ai";
 import { NextRequest } from "next/server";
 import { RiskResult } from "@/lib/riskEngine";
@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
   }
 
   const result = streamText({
-    model: openai("gpt-4o"),
+    model: anthropic("claude-sonnet-4-6"),
     system: buildSystemPrompt(risk),
     messages: [
       {
