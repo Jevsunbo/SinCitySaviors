@@ -4,10 +4,16 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 function getRating(peakRiskScore: number, userAccepted: boolean) {
-  if (peakRiskScore < 50) return { label: "Responsible Player", color: "text-green-400", bg: "bg-green-500/10 border-green-500/20" };
-  if (peakRiskScore < 75 && userAccepted) return { label: "Good Sport", color: "text-yellow-400", bg: "bg-yellow-500/10 border-yellow-500/20" };
-  if (peakRiskScore >= 75 && userAccepted) return { label: "Smart Call", color: "text-indigo-400", bg: "bg-indigo-500/10 border-indigo-500/20" };
-  return { label: "Risky Session", color: "text-red-400", bg: "bg-red-500/10 border-red-500/20" };
+  if (peakRiskScore < 50) return { label: "Responsible Player", color: "text-green-400", border: "border-green-500/30", glow: "shadow-green-500/10" };
+  if (peakRiskScore < 75 && userAccepted) return { label: "Good Sport", color: "text-yellow-400", border: "border-yellow-500/30", glow: "shadow-yellow-500/10" };
+  if (peakRiskScore >= 75 && userAccepted) return { label: "Smart Call", color: "text-indigo-400", border: "border-indigo-500/30", glow: "shadow-indigo-500/10" };
+  return { label: "Risky Session", color: "text-red-400", border: "border-red-500/30", glow: "shadow-red-500/10" };
+}
+
+function getRiskColor(score: number) {
+  if (score >= 75) return { bar: "bg-red-500", text: "text-red-400" };
+  if (score >= 50) return { bar: "bg-yellow-400", text: "text-yellow-400" };
+  return { bar: "bg-green-500", text: "text-green-400" };
 }
 
 function formatDate(date: Date) {
@@ -38,6 +44,11 @@ export default async function HistoryPage() {
   });
 
   const sessions = user?.sessions ?? [];
+  const avgRisk = sessions.length > 0
+    ? Math.round(sessions.reduce((a, s) => a + s.peakRiskScore, 0) / sessions.length)
+    : 0;
+  const aceTriggered = sessions.filter((s) => s.aceTriggered).length;
+  const aceAccepted = sessions.filter((s) => s.userAccepted).length;
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white">
@@ -46,93 +57,135 @@ export default async function HistoryPage() {
         <div className="mx-auto flex max-w-3xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-3">
             <Link href="/dashboard" className="text-zinc-500 hover:text-white transition text-sm">
-              ← Back
+              ←
             </Link>
             <span className="text-zinc-700">|</span>
             <div className="flex items-center gap-2">
-              <span>♠</span>
+              <span className="text-lg">♠</span>
               <h1 className="font-bold tracking-tight">Session History</h1>
             </div>
           </div>
-          <p className="text-sm text-zinc-500">{sessions.length} session{sessions.length !== 1 ? "s" : ""}</p>
+          <Link
+            href="/dashboard"
+            className="rounded-full bg-indigo-600 px-4 py-1.5 text-sm font-semibold hover:bg-indigo-500 transition"
+          >
+            New Session
+          </Link>
         </div>
       </header>
 
-      <main className="mx-auto max-w-3xl px-6 py-8">
+      <main className="mx-auto max-w-3xl px-6 py-8 space-y-8">
         {sessions.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-24 text-center space-y-4">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-zinc-800 text-3xl">♠</div>
-            <h2 className="text-xl font-semibold">No sessions yet</h2>
-            <p className="text-zinc-500 text-sm">Complete a session on the dashboard and it'll show up here.</p>
+          <div className="flex flex-col items-center justify-center py-32 text-center space-y-4">
+            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-indigo-500/10 text-4xl border border-indigo-500/20">
+              ♠
+            </div>
+            <h2 className="text-2xl font-bold">No sessions yet</h2>
+            <p className="text-zinc-500 max-w-xs">
+              Finish a session on the dashboard and your stats will appear here.
+            </p>
             <Link
               href="/dashboard"
-              className="mt-2 rounded-xl bg-indigo-600 px-6 py-2.5 text-sm font-semibold hover:bg-indigo-500 transition"
+              className="mt-2 rounded-xl bg-indigo-600 px-8 py-3 font-semibold hover:bg-indigo-500 transition"
             >
-              Start a session
+              Start your first session
             </Link>
           </div>
         ) : (
           <>
-            {/* Summary stats */}
-            <div className="grid grid-cols-3 gap-4 mb-8">
-              <StatBox
-                label="Total Sessions"
-                value={`${sessions.length}`}
-              />
-              <StatBox
-                label="Avg Risk Score"
-                value={`${Math.round(sessions.reduce((a, s) => a + s.peakRiskScore, 0) / sessions.length)}`}
-                highlight={sessions.reduce((a, s) => a + s.peakRiskScore, 0) / sessions.length >= 50}
-              />
-              <StatBox
-                label="Ace Accepted"
-                value={`${sessions.filter((s) => s.userAccepted).length}/${sessions.filter((s) => s.aceTriggered).length}`}
-                sub="interventions"
-              />
+            {/* Hero stats */}
+            <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-6">
+              <div className="flex items-center gap-3 mb-5">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-500/20 text-lg">♠</div>
+                <div>
+                  <p className="font-semibold text-white">{user?.name ?? "Player"}</p>
+                  <p className="text-xs text-zinc-500">{sessions.length} session{sessions.length !== 1 ? "s" : ""} recorded</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 divide-x divide-zinc-800">
+                <div className="pr-6 space-y-1">
+                  <p className="text-xs text-zinc-500 uppercase tracking-widest">Sessions</p>
+                  <p className="text-3xl font-bold">{sessions.length}</p>
+                </div>
+                <div className="px-6 space-y-1">
+                  <p className="text-xs text-zinc-500 uppercase tracking-widest">Avg Risk</p>
+                  <p className={`text-3xl font-bold ${getRiskColor(avgRisk).text}`}>{avgRisk}</p>
+                  <div className="h-1.5 w-full rounded-full bg-zinc-800 mt-2">
+                    <div
+                      className={`h-1.5 rounded-full ${getRiskColor(avgRisk).bar}`}
+                      style={{ width: `${Math.min(avgRisk, 100)}%` }}
+                    />
+                  </div>
+                </div>
+                <div className="pl-6 space-y-1">
+                  <p className="text-xs text-zinc-500 uppercase tracking-widest">Ace Rate</p>
+                  <p className="text-3xl font-bold">
+                    {aceTriggered > 0 ? `${Math.round((aceAccepted / aceTriggered) * 100)}%` : "—"}
+                  </p>
+                  <p className="text-xs text-zinc-600">{aceAccepted} of {aceTriggered} accepted</p>
+                </div>
+              </div>
             </div>
 
             {/* Session list */}
             <div className="space-y-3">
-              {sessions.map((s) => {
+              <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500">Past Sessions</p>
+              {sessions.map((s, i) => {
                 const rating = getRating(s.peakRiskScore, s.userAccepted);
+                const risk = getRiskColor(s.peakRiskScore);
                 return (
                   <div
                     key={s.id}
-                    className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5"
+                    className={`rounded-2xl border bg-zinc-900 p-5 shadow-lg ${rating.border} ${rating.glow}`}
                   >
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="space-y-1">
-                        <p className="text-sm text-zinc-500">{formatDate(s.startedAt)}</p>
-                        <span className={`inline-block rounded-full border px-2.5 py-0.5 text-xs font-semibold ${rating.bg} ${rating.color}`}>
-                          {rating.label}
+                    {/* Top row */}
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-zinc-800 text-xs font-bold text-zinc-400">
+                          {sessions.length - i}
                         </span>
+                        <div>
+                          <p className="text-sm font-medium text-white">{formatDate(s.startedAt)}</p>
+                          <span className={`text-xs font-semibold ${rating.color}`}>{rating.label}</span>
+                        </div>
                       </div>
-
-                      {/* Risk score ring */}
                       <div className="text-right">
-                        <p className={`text-2xl font-bold ${s.peakRiskScore >= 75 ? "text-red-400" : s.peakRiskScore >= 50 ? "text-yellow-400" : "text-green-400"}`}>
+                        <p className={`text-2xl font-bold leading-none ${risk.text}`}>
                           {Math.round(s.peakRiskScore)}
                         </p>
-                        <p className="text-xs text-zinc-600">peak risk</p>
+                        <p className="text-xs text-zinc-600 mt-0.5">risk score</p>
                       </div>
                     </div>
 
-                    <div className="mt-4 grid grid-cols-3 gap-3 text-center">
-                      <div>
+                    {/* Risk bar */}
+                    <div className="h-1.5 w-full rounded-full bg-zinc-800 mb-4">
+                      <div
+                        className={`h-1.5 rounded-full transition-all ${risk.bar}`}
+                        style={{ width: `${Math.min(s.peakRiskScore, 100)}%` }}
+                      />
+                    </div>
+
+                    {/* Stats row */}
+                    <div className="grid grid-cols-3 gap-2 text-center">
+                      <div className="rounded-xl bg-zinc-800/60 py-2.5">
                         <p className="text-sm font-semibold text-white">{s.duration ?? "—"}m</p>
-                        <p className="text-xs text-zinc-600">duration</p>
+                        <p className="text-xs text-zinc-500">duration</p>
                       </div>
-                      <div>
-                        <p className="text-sm font-semibold text-white">
-                          {s.aceTriggered ? (s.userAccepted ? "Accepted" : "Declined") : "No trigger"}
+                      <div className="rounded-xl bg-zinc-800/60 py-2.5">
+                        <p className={`text-sm font-semibold ${
+                          !s.aceTriggered ? "text-zinc-400" :
+                          s.userAccepted ? "text-green-400" : "text-red-400"
+                        }`}>
+                          {s.aceTriggered ? (s.userAccepted ? "✓ Accepted" : "✕ Declined") : "No check-in"}
                         </p>
-                        <p className="text-xs text-zinc-600">Ace</p>
+                        <p className="text-xs text-zinc-500">Ace</p>
                       </div>
-                      <div>
+                      <div className="rounded-xl bg-zinc-800/60 py-2.5">
                         <p className="text-sm font-semibold text-white">
                           {s.finalBankroll != null ? `$${Math.round(s.finalBankroll)}` : "—"}
                         </p>
-                        <p className="text-xs text-zinc-600">spent</p>
+                        <p className="text-xs text-zinc-500">spent</p>
                       </div>
                     </div>
                   </div>
@@ -142,21 +195,6 @@ export default async function HistoryPage() {
           </>
         )}
       </main>
-    </div>
-  );
-}
-
-function StatBox({ label, value, sub, highlight = false }: {
-  label: string;
-  value: string;
-  sub?: string;
-  highlight?: boolean;
-}) {
-  return (
-    <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-4 text-center">
-      <p className="text-xs text-zinc-500">{label}</p>
-      <p className={`mt-1 text-2xl font-bold ${highlight ? "text-red-400" : "text-white"}`}>{value}</p>
-      {sub && <p className="text-xs text-zinc-600">{sub}</p>}
     </div>
   );
 }
