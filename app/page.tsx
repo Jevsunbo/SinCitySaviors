@@ -1,5 +1,6 @@
 import Link from "next/link";
 import ScrollPopup from "@/components/ScrollPopup";
+import UserAvatar from "@/components/UserAvatar";
 
 export default function LandingPage() {
   return (
@@ -11,20 +12,7 @@ export default function LandingPage() {
             <span className="text-xl">♠</span>
             <span className="font-bold tracking-tight">Sin City Saviors</span>
           </div>
-          <div className="flex items-center gap-2">
-            <Link
-              href="/sign-in"
-              className="rounded-full bg-indigo-600 px-4 py-1.5 text-sm font-semibold hover:bg-indigo-500 transition"
-            >
-              Sign in
-            </Link>
-            <Link
-              href="/dashboard"
-              className="rounded-full border border-zinc-700 px-4 py-1.5 text-sm font-semibold text-zinc-400 hover:border-zinc-500 hover:text-white transition"
-            >
-              Try free
-            </Link>
-          </div>
+          <UserAvatar />
         </div>
       </nav>
 

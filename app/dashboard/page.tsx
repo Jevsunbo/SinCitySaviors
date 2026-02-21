@@ -8,6 +8,7 @@ import SessionSummary from "@/components/SessionSummary";
 import ActivityCards from "@/components/ActivityCards";
 import { calculateRisk, MentalHealthProfile, RiskResult, SessionData } from "@/lib/riskEngine";
 import { createMockSession } from "@/lib/mockSession";
+import UserAvatar from "@/components/UserAvatar";
 
 const DEFAULT_RISK: RiskResult = calculateRisk(createMockSession("normal"));
 
@@ -66,7 +67,10 @@ export default function DashboardPage() {
               <p className="text-xs text-zinc-500">Responsible Gaming Companion</p>
             </div>
           </div>
-          <RiskBadge level={risk.level} score={risk.score} />
+          <div className="flex items-center gap-3">
+            <RiskBadge level={risk.level} score={risk.score} />
+            <UserAvatar />
+          </div>
         </div>
       </header>
 
