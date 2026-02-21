@@ -109,12 +109,7 @@ export default function DashboardPage() {
 
         {/* Stat cards */}
         <div className="grid grid-cols-3 gap-4">
-          <StatCard
-            label="Session Time"
-            icon="⏱"
-            value={`${risk.sessionDurationMinutes}m`}
-            sub="active duration"
-          />
+          <SessionTimeCard minutes={risk.sessionDurationMinutes} />
           <StatCard
             label="Bankroll"
             icon="💰"
@@ -196,6 +191,43 @@ function RiskBadge({ level, score }: { level: RiskResult["level"]; score: number
       <span className={`h-1.5 w-1.5 rounded-full ${dot} ${level === "high" ? "animate-pulse" : ""}`} />
       {label} · {score}
     </span>
+  );
+}
+
+function SessionTimeCard({ minutes }: { minutes: number }) {
+  const hrs = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+  const display = hrs > 0 ? `${hrs}h ${mins}m` : `${mins}m`;
+
+  const intensity =
+    minutes >= 120 ? "text-red-400" :
+    minutes >= 60  ? "text-yellow-400" :
+    "text-white";
+
+  return (
+    <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5 space-y-1">
+      <div className="flex items-center justify-between">
+        <p className="text-xs text-zinc-500">Session Time</p>
+        <div className="flex items-center gap-1.5 rounded-full bg-zinc-800 px-2 py-0.5">
+          <span className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" />
+          <span className="text-xs text-zinc-400 font-medium">Live</span>
+        </div>
+      </div>
+      <p className={`text-3xl font-bold ${intensity}`}>{display}</p>
+      <p className="text-xs text-zinc-600">active duration</p>
+      <div className="flex gap-1 mt-2">
+        {Array.from({ length: 12 }).map((_, i) => (
+          <div
+            key={i}
+            className={`flex-1 h-1.5 rounded-full transition-all duration-700 ${
+              i < Math.ceil((minutes / 120) * 12)
+                ? minutes >= 120 ? "bg-red-500" : minutes >= 60 ? "bg-yellow-400" : "bg-green-500"
+                : "bg-zinc-800"
+            }`}
+          />
+        ))}
+      </div>
+    </div>
   );
 }
 
