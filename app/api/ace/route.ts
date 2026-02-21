@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
         content: "Hey Ace, how's my session going?",
       },
     ],
-    maxOutputTokens: 80,
+    maxOutputTokens: 150,
   });
 
   return result.toTextStreamResponse();
