@@ -15,5 +15,39 @@ model User {
   email     String   @unique
   name      String?
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+
+  // Onboarding
+  ageVerified         Boolean @default(false)
+  budgetLimit         Float?
+  timeLimit           Int?
+  preferredActivities String?
+
+  // Mental health check-in
+  onboardingMood       String? // "great" | "good" | "okay" | "not_great"
+  onboardingStress     String? // "low" | "moderate" | "high" | "very_high"
+  onboardingIntent     String? // "fun" | "celebrating" | "bored" | "escaping"
+  baselineRiskModifier Int     @default(0)
+
+  // Behavioral stats
+  totalSessions      Int      @default(0)
+  avgSessionDuration Float    @default(0)
+  avgRiskScore       Float    @default(0)
+  aceInterventions   Int      @default(0)
+  aceAccepted        Int      @default(0)
+  lastSessionAt      DateTime?
+
+  sessions Session[]
+}
+
+model Session {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id])
+  startedAt     DateTime  @default(now())
+  endedAt       DateTime?
+  duration      Int?
+  peakRiskScore Float     @default(0)
+  finalBankroll Float?
+  aceTriggered  Boolean   @default(false)
+  userAccepted  Boolean   @default(false)
 }

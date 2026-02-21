@@ -3,13 +3,20 @@
 import { useState } from "react";
 import Dashboard from "@/components/Dashboard";
 import AceChat from "@/components/AceChat";
-import { calculateRisk, RiskResult, SessionData } from "@/lib/riskEngine";
+import Onboarding from "@/components/Onboarding";
+import { calculateRisk, MentalHealthProfile, RiskResult } from "@/lib/riskEngine";
 import { createMockSession } from "@/lib/mockSession";
 
 const DEFAULT_RISK: RiskResult = calculateRisk(createMockSession("normal"));
 
 export default function DashboardPage() {
   const [risk, setRisk] = useState<RiskResult>(DEFAULT_RISK);
+  const [mentalHealth, setMentalHealth] = useState<MentalHealthProfile | null>(null);
+
+  // Show onboarding until completed
+  if (!mentalHealth) {
+    return <Onboarding onComplete={setMentalHealth} />;
+  }
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white">
@@ -54,7 +61,7 @@ export default function DashboardPage() {
         <div className="grid gap-6 lg:grid-cols-5">
           {/* Chart takes more space */}
           <div className="lg:col-span-3">
-            <Dashboard onRiskUpdate={setRisk} />
+            <Dashboard onRiskUpdate={setRisk} mentalHealth={mentalHealth} />
           </div>
 
           {/* Ace sidebar */}
@@ -130,6 +137,7 @@ const TRIGGER_LABELS: Record<string, string> = {
   long_session: "Long Session",
   velocity_spike: "Velocity Spike",
   bankroll_erosion: "Bankroll Erosion",
+  mental_health_baseline: "Mental Health Baseline",
 };
 
 function TriggerPill({ trigger }: { trigger: string }) {

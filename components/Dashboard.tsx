@@ -12,7 +12,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { calculateRisk, RiskResult, SessionData } from "@/lib/riskEngine";
+import { calculateRisk, MentalHealthProfile, RiskResult, SessionData } from "@/lib/riskEngine";
 import { addLiveBet, createMockSession, ScenarioMode } from "@/lib/mockSession";
 
 interface ChartPoint {
@@ -24,6 +24,7 @@ interface ChartPoint {
 
 interface DashboardProps {
   onRiskUpdate: (risk: RiskResult) => void;
+  mentalHealth?: MentalHealthProfile | null;
 }
 
 const MODES: { value: ScenarioMode; label: string }[] = [
@@ -82,7 +83,7 @@ function RiskMeter({ score, level }: { score: number; level: RiskResult["level"]
   );
 }
 
-export default function Dashboard({ onRiskUpdate }: DashboardProps) {
+export default function Dashboard({ onRiskUpdate, mentalHealth }: DashboardProps) {
   const [mode, setMode] = useState<ScenarioMode>("normal");
   const [session, setSession] = useState<SessionData>(() =>
     createMockSession("normal")
@@ -95,12 +96,15 @@ export default function Dashboard({ onRiskUpdate }: DashboardProps) {
 
   const chartData = buildChartData(session);
 
-  // Recalculate risk whenever session changes
+  // Recalculate risk whenever session or mental health profile changes
   useEffect(() => {
-    const newRisk = calculateRisk(session);
+    const newRisk = calculateRisk({
+      ...session,
+      mentalHealth: mentalHealth ?? undefined,
+    });
     setRisk(newRisk);
     onRiskUpdate(newRisk);
-  }, [session]);
+  }, [session, mentalHealth]);
 
   // Live simulation tick
   useEffect(() => {
