@@ -9,6 +9,7 @@ import ActivityCards from "@/components/ActivityCards";
 import { calculateRisk, MentalHealthProfile, RiskResult, SessionData } from "@/lib/riskEngine";
 import { createMockSession } from "@/lib/mockSession";
 import UserAvatar from "@/components/UserAvatar";
+import Link from "next/link";
 
 const DEFAULT_RISK: RiskResult = calculateRisk(createMockSession("normal"));
 
@@ -19,12 +20,10 @@ export default function DashboardPage() {
   const [aceTriggered, setAceTriggered] = useState(false);
   const [userAccepted, setUserAccepted] = useState(false);
 
-  // Show onboarding until completed
   if (!mentalHealth) {
     return <Onboarding onComplete={setMentalHealth} />;
   }
 
-  // Show session summary when session ends
   if (endedSession) {
     const wins = endedSession.bets.filter((b) => b.outcome === "win").length;
     const losses = endedSession.bets.filter((b) => b.outcome === "loss").length;
@@ -55,51 +54,78 @@ export default function DashboardPage() {
     );
   }
 
+  const riskColor =
+    risk.level === "high"
+      ? "text-red-400"
+      : risk.level === "moderate"
+      ? "text-yellow-400"
+      : "text-green-400";
+
+  const riskBorderGlow =
+    risk.level === "high"
+      ? "border-red-500/30 shadow-red-500/10"
+      : risk.level === "moderate"
+      ? "border-yellow-500/20 shadow-yellow-500/5"
+      : "border-zinc-800 shadow-transparent";
+
   return (
     <div className="min-h-screen bg-zinc-950 text-white">
-      {/* Top bar */}
-      <header className="border-b border-zinc-800 bg-zinc-900/80 backdrop-blur">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
+
+      {/* Header */}
+      <header className="sticky top-0 z-10 border-b border-zinc-800 bg-zinc-950/90 backdrop-blur">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3.5">
           <div className="flex items-center gap-3">
-            <span className="text-2xl">♠</span>
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-sm font-bold">♠</div>
             <div>
-              <h1 className="text-lg font-bold tracking-tight">Sin City Saviors</h1>
-              <p className="text-xs text-zinc-500">Responsible Gaming Companion</p>
+              <h1 className="text-sm font-bold tracking-tight leading-none">Sin City Saviors</h1>
+              <p className="text-xs text-zinc-500 mt-0.5">Responsible Gaming Companion</p>
             </div>
           </div>
+
           <div className="flex items-center gap-3">
+            {/* Live indicator */}
+            <div className="hidden sm:flex items-center gap-1.5 rounded-full border border-zinc-800 bg-zinc-900 px-3 py-1.5">
+              <span className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" />
+              <span className="text-xs text-zinc-400 font-medium">Live</span>
+            </div>
+
             <RiskBadge level={risk.level} score={risk.score} />
             <UserAvatar />
           </div>
         </div>
       </header>
 
-      {/* Main content */}
-      <main className="mx-auto max-w-5xl px-6 py-8 space-y-6">
-        {/* Stats row */}
+      <main className="mx-auto max-w-6xl px-6 py-6 space-y-5">
+
+        {/* Stat cards */}
         <div className="grid grid-cols-3 gap-4">
           <StatCard
             label="Session Time"
+            icon="⏱"
             value={`${risk.sessionDurationMinutes}m`}
-            sub="duration"
+            sub="active duration"
           />
           <StatCard
             label="Bankroll"
+            icon="💰"
             value={`${risk.bankrollRemainingPct}%`}
             sub="remaining"
-            highlight={risk.bankrollRemainingPct < 50}
+            bar={{ pct: risk.bankrollRemainingPct, color: risk.bankrollRemainingPct < 30 ? "bg-red-500" : risk.bankrollRemainingPct < 60 ? "bg-yellow-400" : "bg-green-500" }}
+            valueColor={risk.bankrollRemainingPct < 50 ? "text-red-400" : "text-white"}
           />
           <StatCard
             label="Risk Score"
+            icon="⚠️"
             value={`${risk.score}`}
             sub="out of 100"
-            highlight={risk.score >= 50}
+            bar={{ pct: risk.score, color: risk.score >= 75 ? "bg-red-500" : risk.score >= 50 ? "bg-yellow-400" : "bg-green-500" }}
+            valueColor={riskColor}
           />
         </div>
 
-        {/* Two-column layout on larger screens */}
-        <div className="grid gap-6 lg:grid-cols-5 lg:items-stretch">
-          {/* Chart takes more space */}
+        {/* Main layout */}
+        <div className={`grid gap-5 lg:grid-cols-5 lg:items-stretch rounded-2xl border shadow-lg transition-all duration-700 p-5 bg-zinc-900/40 ${riskBorderGlow}`}>
+          {/* Chart */}
           <div className="lg:col-span-3">
             <Dashboard
               onRiskUpdate={setRisk}
@@ -108,16 +134,16 @@ export default function DashboardPage() {
             />
           </div>
 
-          {/* Ace sidebar */}
+          {/* Sidebar */}
           <div className="lg:col-span-2 flex flex-col gap-4">
             <AceChat risk={risk} />
             <ActivityCards risk={risk} onAccept={() => setUserAccepted(true)} />
 
-            {/* Active triggers — pushes to bottom of column */}
+            {/* Active signals */}
             <div className="mt-auto">
-              {risk.triggers.length > 0 && (
+              {risk.triggers.length > 0 ? (
                 <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-4">
-                  <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-zinc-500">
+                  <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-zinc-500">
                     Active Signals
                   </p>
                   <div className="flex flex-wrap gap-2">
@@ -126,10 +152,16 @@ export default function DashboardPage() {
                     ))}
                   </div>
                 </div>
+              ) : (
+                <div className="rounded-xl border border-zinc-800/50 bg-zinc-900/50 p-4 flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full bg-green-500" />
+                  <p className="text-xs text-zinc-500">No risk signals detected</p>
+                </div>
               )}
             </div>
           </div>
         </div>
+
       </main>
     </div>
   );
@@ -138,16 +170,20 @@ export default function DashboardPage() {
 function RiskBadge({ level, score }: { level: RiskResult["level"]; score: number }) {
   const styles =
     level === "high"
-      ? "bg-red-500/20 text-red-400 border-red-500/30"
+      ? "bg-red-500/20 text-red-400 border-red-500/40"
       : level === "moderate"
-      ? "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"
-      : "bg-green-500/20 text-green-400 border-green-500/30";
+      ? "bg-yellow-500/20 text-yellow-400 border-yellow-500/40"
+      : "bg-green-500/20 text-green-400 border-green-500/40";
+
+  const dot =
+    level === "high" ? "bg-red-400" : level === "moderate" ? "bg-yellow-400" : "bg-green-400";
 
   const label =
     level === "high" ? "High Risk" : level === "moderate" ? "Moderate" : "All Clear";
 
   return (
-    <span className={`rounded-full border px-3 py-1 text-xs font-semibold ${styles}`}>
+    <span className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition-all duration-500 ${styles}`}>
+      <span className={`h-1.5 w-1.5 rounded-full ${dot} ${level === "high" ? "animate-pulse" : ""}`} />
       {label} · {score}
     </span>
   );
@@ -155,42 +191,53 @@ function RiskBadge({ level, score }: { level: RiskResult["level"]; score: number
 
 function StatCard({
   label,
+  icon,
   value,
   sub,
-  highlight = false,
+  valueColor = "text-white",
+  bar,
 }: {
   label: string;
+  icon: string;
   value: string;
   sub: string;
-  highlight?: boolean;
+  valueColor?: string;
+  bar?: { pct: number; color: string };
 }) {
   return (
-    <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-4">
-      <p className="text-xs text-zinc-500">{label}</p>
-      <p
-        className={`mt-1 text-2xl font-bold ${
-          highlight ? "text-red-400" : "text-white"
-        }`}
-      >
-        {value}
-      </p>
+    <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5 space-y-1">
+      <div className="flex items-center justify-between">
+        <p className="text-xs text-zinc-500">{label}</p>
+        <span className="text-sm">{icon}</span>
+      </div>
+      <p className={`text-3xl font-bold ${valueColor}`}>{value}</p>
       <p className="text-xs text-zinc-600">{sub}</p>
+      {bar && (
+        <div className="h-1.5 w-full rounded-full bg-zinc-800 mt-2">
+          <div
+            className={`h-1.5 rounded-full transition-all duration-700 ${bar.color}`}
+            style={{ width: `${Math.min(bar.pct, 100)}%` }}
+          />
+        </div>
+      )}
     </div>
   );
 }
 
-const TRIGGER_LABELS: Record<string, string> = {
-  loss_chasing: "Loss Chasing",
-  long_session: "Long Session",
-  velocity_spike: "Velocity Spike",
-  bankroll_erosion: "Bankroll Erosion",
-  mental_health_baseline: "Mental Health Baseline",
+const TRIGGER_LABELS: Record<string, { label: string; icon: string }> = {
+  loss_chasing:           { label: "Loss Chasing",    icon: "📉" },
+  long_session:           { label: "Long Session",    icon: "⏰" },
+  velocity_spike:         { label: "Velocity Spike",  icon: "⚡" },
+  bankroll_erosion:       { label: "Bankroll Erosion",icon: "💸" },
+  mental_health_baseline: { label: "Mental Health",   icon: "🧠" },
 };
 
 function TriggerPill({ trigger }: { trigger: string }) {
+  const info = TRIGGER_LABELS[trigger] ?? { label: trigger, icon: "⚠️" };
   return (
-    <span className="rounded-full bg-red-500/10 px-3 py-1 text-xs font-medium text-red-400 border border-red-500/20">
-      {TRIGGER_LABELS[trigger] ?? trigger}
+    <span className="flex items-center gap-1.5 rounded-full bg-red-500/10 px-3 py-1 text-xs font-medium text-red-400 border border-red-500/20">
+      <span>{info.icon}</span>
+      {info.label}
     </span>
   );
 }
