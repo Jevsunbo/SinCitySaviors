@@ -44,6 +44,13 @@ export default function UserAvatar() {
               <p className="text-sm font-semibold text-white truncate">{user.name}</p>
               <p className="text-xs text-zinc-500 truncate">{user.email}</p>
             </div>
+            <Link
+              href="/history"
+              onClick={() => setOpen(false)}
+              className="block w-full text-left px-4 py-2.5 text-sm text-zinc-300 hover:bg-zinc-800 transition"
+            >
+              Session History
+            </Link>
             <button
               onClick={() => {
                 localStorage.removeItem("ace_player_name");
