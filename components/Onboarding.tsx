@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSession } from "next-auth/react";
 import { MentalHealthProfile } from "@/lib/riskEngine";
 
 interface OnboardingData {
@@ -52,12 +53,15 @@ function getAceIntro(data: OnboardingData): string {
 }
 
 export default function Onboarding({ onComplete }: OnboardingProps) {
+  const { data: session } = useSession();
   const savedName = typeof window !== "undefined" ? localStorage.getItem("ace_player_name") ?? "" : "";
   const isReturning = savedName.length > 0;
+  // Pre-fill name from OAuth provider on first sign-in
+  const defaultName = savedName || session?.user?.name || "";
   const [step, setStep] = useState(isReturning ? 2 : 1);
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<OnboardingData>({
-    name: savedName,
+    name: defaultName,
     ageVerified: isReturning, // returning users already verified
     budgetLimit: 500,
     timeLimit: 120,

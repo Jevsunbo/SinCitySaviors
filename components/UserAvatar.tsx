@@ -45,7 +45,10 @@ export default function UserAvatar() {
               <p className="text-xs text-zinc-500 truncate">{user.email}</p>
             </div>
             <button
-              onClick={() => signOut({ callbackUrl: "/" })}
+              onClick={() => {
+                localStorage.removeItem("ace_player_name");
+                signOut({ callbackUrl: "/" });
+              }}
               className="w-full text-left px-4 py-2.5 text-sm text-red-400 hover:bg-zinc-800 transition"
             >
               Sign out
