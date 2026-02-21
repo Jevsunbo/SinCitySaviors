@@ -8,14 +8,11 @@ export default function LandingPage() {
       {/* Nav */}
       <nav className="border-b border-zinc-800/50 bg-zinc-950/90 backdrop-blur sticky top-0 z-20">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <div className="flex items-center gap-2.5">
+          <Link href="/" className="flex items-center gap-2.5 hover:opacity-80 transition">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-sm font-bold">♠</div>
             <span className="font-bold tracking-tight text-lg">Sin City Saviors</span>
-          </div>
-          <div className="flex items-center gap-4">
-            <a href="#how-it-works" className="hidden sm:block text-sm text-zinc-400 hover:text-white transition">How it works</a>
-            <UserAvatar />
-          </div>
+          </Link>
+          <UserAvatar />
         </div>
       </nav>
 
