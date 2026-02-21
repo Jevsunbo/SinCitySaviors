@@ -148,7 +148,7 @@ export default function AceChat({ risk }: AceChatProps) {
       </div>
 
       {/* Message bubble */}
-      <div className="h-[80px] overflow-y-auto rounded-xl bg-zinc-800 px-4 py-3 text-sm leading-relaxed text-zinc-100">
+      <div className="rounded-xl bg-zinc-800 px-4 py-3 text-sm leading-relaxed text-zinc-100">
         {message || (isStreaming ? <TypingDots /> : null)}
         {isStreaming && message && <TypingDots />}
       </div>
