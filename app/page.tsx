@@ -1,4 +1,5 @@
 import Link from "next/link";
+import ScrollPopup from "@/components/ScrollPopup";
 
 export default function LandingPage() {
   return (
@@ -10,12 +11,20 @@ export default function LandingPage() {
             <span className="text-xl">♠</span>
             <span className="font-bold tracking-tight">Sin City Saviors</span>
           </div>
-          <Link
-            href="/dashboard"
-            className="rounded-full bg-indigo-600 px-4 py-1.5 text-sm font-semibold hover:bg-indigo-500 transition"
-          >
-            Start Session
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/sign-in"
+              className="rounded-full bg-indigo-600 px-4 py-1.5 text-sm font-semibold hover:bg-indigo-500 transition"
+            >
+              Sign in
+            </Link>
+            <Link
+              href="/dashboard"
+              className="rounded-full border border-zinc-700 px-4 py-1.5 text-sm font-semibold text-zinc-400 hover:border-zinc-500 hover:text-white transition"
+            >
+              Try free
+            </Link>
+          </div>
         </div>
       </nav>
 
@@ -167,29 +176,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Sign in CTA */}
-      <section className="border-t border-zinc-800 bg-zinc-900/50 py-20">
-        <div className="mx-auto max-w-xl px-6 text-center">
-          <h2 className="text-3xl font-bold">Ready to play smarter?</h2>
-          <p className="mt-3 text-zinc-400">
-            Sign in to save your session history and let Ace get to know you better over time.
-          </p>
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
-            <Link
-              href="/sign-in"
-              className="rounded-full bg-indigo-600 px-6 py-3 font-semibold hover:bg-indigo-500 transition"
-            >
-              Sign in
-            </Link>
-            <Link
-              href="/dashboard"
-              className="rounded-full border border-zinc-700 px-6 py-3 font-semibold text-zinc-400 hover:border-zinc-500 hover:text-white transition"
-            >
-              Try without signing in
-            </Link>
-          </div>
-        </div>
-      </section>
+      <ScrollPopup />
 
       {/* Footer */}
       <footer className="border-t border-zinc-800 py-8">
