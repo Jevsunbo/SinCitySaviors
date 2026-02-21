@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import BackButton from "@/components/BackButton";
 
 function getRating(peakRiskScore: number, userAccepted: boolean) {
   if (peakRiskScore < 50) return { label: "Responsible Player", color: "text-green-400", border: "border-green-500/30", glow: "shadow-green-500/10" };
@@ -56,9 +57,7 @@ export default async function HistoryPage() {
       <header className="border-b border-zinc-800 bg-zinc-900/80 backdrop-blur sticky top-0 z-10">
         <div className="mx-auto flex max-w-3xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-3">
-            <Link href="/dashboard" className="text-zinc-500 hover:text-white transition text-sm">
-              ←
-            </Link>
+            <BackButton />
             <span className="text-zinc-700">|</span>
             <div className="flex items-center gap-2">
               <span className="text-lg">♠</span>
