@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { MentalHealthProfile } from "@/lib/riskEngine";
 
@@ -54,21 +54,30 @@ function getAceIntro(data: OnboardingData): string {
 
 export default function Onboarding({ onComplete }: OnboardingProps) {
   const { data: session } = useSession();
-  const savedName = typeof window !== "undefined" ? localStorage.getItem("ace_player_name") ?? "" : "";
-  const isReturning = savedName.length > 0;
-  // Pre-fill name from OAuth provider on first sign-in
-  const defaultName = savedName || session?.user?.name || "";
-  const [step, setStep] = useState(isReturning ? 2 : 1);
+  const [isReturning, setIsReturning] = useState(false);
+  const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<OnboardingData>({
-    name: defaultName,
-    ageVerified: isReturning, // returning users already verified
+    name: "",
+    ageVerified: false,
     budgetLimit: 500,
     timeLimit: 120,
     mood: undefined,
     stress: undefined,
     intent: undefined,
   });
+
+  // Read localStorage only on the client after hydration
+  useEffect(() => {
+    const saved = localStorage.getItem("ace_player_name") ?? "";
+    if (saved) {
+      setIsReturning(true);
+      setStep(2);
+      setData((prev) => ({ ...prev, name: saved, ageVerified: true }));
+    } else if (session?.user?.name) {
+      setData((prev) => ({ ...prev, name: session.user!.name! }));
+    }
+  }, [session?.user?.name]);
 
   function update<K extends keyof OnboardingData>(key: K, value: OnboardingData[K]) {
     setData((prev) => ({ ...prev, [key]: value }));
@@ -119,7 +128,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
           <div className="space-y-6">
             <div>
               <h1 className="text-2xl font-bold text-white">
-                {savedName ? `Welcome back, ${savedName}!` : "Welcome to Sin City Saviors"}
+                {isReturning ? `Welcome back, ${data.name}!` : "Welcome to Sin City Saviors"}
               </h1>
               <p className="mt-1 text-zinc-400">Let's get you set up before you play.</p>
             </div>
