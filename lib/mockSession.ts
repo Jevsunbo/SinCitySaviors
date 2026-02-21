@@ -7,7 +7,58 @@ export type ScenarioMode =
   | "loss_chase"   // triggers loss chasing
   | "velocity"     // triggers velocity spike
   | "erosion"      // triggers bankroll erosion
-  | "tilt";        // triggers everything
+  | "tilt"         // triggers everything
+  | "demo";        // scripted live demo sequence
+
+// Pre-scripted demo: safe → Moderate (loss chasing) → High (velocity + erosion)
+// Each bet is added ~1.2s apart during the live demo.
+export const DEMO_SCRIPT: { amount: number; outcome: "win" | "loss" }[] = [
+  { amount: 30, outcome: "win" },   // 1. Normal win
+  { amount: 25, outcome: "loss" },  // 2. Small loss
+  { amount: 30, outcome: "win" },   // 3. Recovery
+  { amount: 35, outcome: "loss" },  // 4. Loss — start of trouble
+  { amount: 54, outcome: "loss" },  // 5. Chase! (1.54×) — streak begins
+  { amount: 30, outcome: "loss" },  // 6. Another loss
+  { amount: 46, outcome: "loss" },  // 7. Chase! (1.53×) → LOSS CHASING +30 → Moderate
+  { amount: 60, outcome: "loss" },  // 8. Rapid bet → VELOCITY SPIKE +25 → ~55
+  { amount: 80, outcome: "loss" },  // 9. → BANKROLL EROSION +25 → ~80 HIGH → Ace fires
+  { amount: 95, outcome: "loss" },  // 10. Full tilt
+  { amount: 110, outcome: "loss" }, // 11. Script ends — session should be ended
+];
+
+// Creates a demo session with 5 baseline bets from 8–14 min ago so the
+// velocity spike check has a non-zero comparison window.
+export function createDemoSession(initialBankroll = 500): SessionData {
+  betCounter = 0;
+  const bets: Bet[] = [];
+  let bankroll = initialBankroll;
+  const startTime = Date.now() - 22 * 60000;
+
+  const applyBet = (bet: Bet) => {
+    bets.push(bet);
+    bankroll += bet.outcome === "win" ? bet.amount * 0.9 : -bet.amount;
+    bankroll = Math.max(0, bankroll);
+  };
+
+  const baselineOffsets = [14, 12, 11, 9, 8]; // minutes ago
+  const baseBets: { amount: number; outcome: "win" | "loss" }[] = [
+    { amount: 20, outcome: "loss" },
+    { amount: 25, outcome: "win" },
+    { amount: 20, outcome: "loss" },
+    { amount: 30, outcome: "loss" },
+    { amount: 25, outcome: "loss" },
+  ];
+  baselineOffsets.forEach((mins, i) => {
+    applyBet({
+      id: `bet_${++betCounter}`,
+      amount: baseBets[i].amount,
+      outcome: baseBets[i].outcome,
+      timestamp: Date.now() - mins * 60000,
+    });
+  });
+
+  return { bets, startTime, initialBankroll, currentBankroll: bankroll };
+}
 
 function randomBetween(min: number, max: number) {
   return Math.round(min + Math.random() * (max - min));

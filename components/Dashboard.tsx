@@ -12,8 +12,8 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { calculateRisk, MentalHealthProfile, RiskResult, SessionData } from "@/lib/riskEngine";
-import { addLiveBet, createMockSession, ScenarioMode } from "@/lib/mockSession";
+import { calculateRisk, Bet, MentalHealthProfile, RiskResult, SessionData } from "@/lib/riskEngine";
+import { addLiveBet, createDemoSession, createMockSession, DEMO_SCRIPT, ScenarioMode } from "@/lib/mockSession";
 
 interface ChartPoint {
   bet: number;
@@ -34,6 +34,7 @@ const MODES: { value: ScenarioMode; label: string }[] = [
   { value: "velocity", label: "Velocity Spike" },
   { value: "erosion", label: "Bankroll Erosion" },
   { value: "tilt", label: "Full Tilt" },
+  { value: "demo", label: "Demo" },
 ];
 
 function buildChartData(session: SessionData): ChartPoint[] {
@@ -94,6 +95,7 @@ export default function Dashboard({ onRiskUpdate, onEndSession, mentalHealth }: 
   );
   const [isRunning, setIsRunning] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const demoStepRef = useRef(0);
 
   const chartData = buildChartData(session);
 
@@ -111,8 +113,32 @@ export default function Dashboard({ onRiskUpdate, onEndSession, mentalHealth }: 
   useEffect(() => {
     if (isRunning) {
       intervalRef.current = setInterval(() => {
-        setSession((prev) => addLiveBet(prev, mode));
-      }, 1500);
+        if (mode === "demo") {
+          const step = demoStepRef.current;
+          if (step >= DEMO_SCRIPT.length) {
+            setIsRunning(false);
+            return;
+          }
+          const { amount, outcome } = DEMO_SCRIPT[step];
+          demoStepRef.current = step + 1;
+          const newBet: Bet = {
+            id: `bet_demo_${step + 1}`,
+            amount,
+            outcome,
+            timestamp: Date.now(),
+          };
+          setSession((prev) => {
+            const bankrollDelta = outcome === "win" ? amount * 0.9 : -amount;
+            return {
+              ...prev,
+              bets: [...prev.bets, newBet],
+              currentBankroll: Math.max(0, prev.currentBankroll + bankrollDelta),
+            };
+          });
+        } else {
+          setSession((prev) => addLiveBet(prev, mode));
+        }
+      }, mode === "demo" ? 1200 : 1500);
     } else {
       if (intervalRef.current) clearInterval(intervalRef.current);
     }
@@ -124,14 +150,24 @@ export default function Dashboard({ onRiskUpdate, onEndSession, mentalHealth }: 
   function handleModeChange(newMode: ScenarioMode) {
     setMode(newMode);
     setIsRunning(false);
-    const newSession = createMockSession(newMode);
-    setSession(newSession);
+    demoStepRef.current = 0;
+    if (newMode === "demo") {
+      setSession(createDemoSession());
+      setTimeout(() => setIsRunning(true), 100);
+    } else {
+      setSession(createMockSession(newMode));
+    }
   }
 
   function handleReset() {
     setIsRunning(false);
-    const newSession = createMockSession(mode);
-    setSession(newSession);
+    demoStepRef.current = 0;
+    if (mode === "demo") {
+      setSession(createDemoSession());
+      setTimeout(() => setIsRunning(true), 100);
+    } else {
+      setSession(createMockSession(mode));
+    }
   }
 
   return (
@@ -139,7 +175,14 @@ export default function Dashboard({ onRiskUpdate, onEndSession, mentalHealth }: 
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-bold">Live Session</h2>
+          <div className="flex items-center gap-2">
+            <h2 className="text-xl font-bold">Live Session</h2>
+            {mode === "demo" && (
+              <span className="rounded-full bg-indigo-500/20 border border-indigo-500/40 px-2.5 py-0.5 text-xs font-bold text-indigo-300 animate-pulse">
+                DEMO
+              </span>
+            )}
+          </div>
           <p className="text-sm text-zinc-400">
             {session.bets.length} bets · ${Math.round(session.currentBankroll)}{" "}
             remaining of ${session.initialBankroll}
@@ -176,7 +219,7 @@ export default function Dashboard({ onRiskUpdate, onEndSession, mentalHealth }: 
 
       {/* Scenario selector */}
       <div className="flex flex-wrap gap-2">
-        {MODES.map((m) => (
+        {MODES.filter((m) => m.value !== "demo").map((m) => (
           <button
             key={m.value}
             onClick={() => handleModeChange(m.value)}
@@ -189,6 +232,16 @@ export default function Dashboard({ onRiskUpdate, onEndSession, mentalHealth }: 
             {m.label}
           </button>
         ))}
+        <button
+          onClick={() => handleModeChange("demo")}
+          className={`rounded-full px-3 py-1 text-xs font-bold transition ${
+            mode === "demo"
+              ? "bg-indigo-500 text-white shadow shadow-indigo-500/30"
+              : "border border-indigo-500/40 text-indigo-400 hover:bg-indigo-500/10"
+          }`}
+        >
+          ⚡ Demo Mode
+        </button>
       </div>
 
       {/* Risk meter */}
