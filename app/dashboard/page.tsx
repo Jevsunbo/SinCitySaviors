@@ -208,10 +208,7 @@ function SessionTimeCard({ minutes }: { minutes: number }) {
     <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5 space-y-1">
       <div className="flex items-center justify-between">
         <p className="text-xs text-zinc-500">Session Time</p>
-        <div className="flex items-center gap-1.5 rounded-full bg-zinc-800 px-2 py-0.5">
-          <span className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" />
-          <span className="text-xs text-zinc-400 font-medium">Live</span>
-        </div>
+        <span className="text-sm">⏱</span>
       </div>
       <p className={`text-3xl font-bold ${intensity}`}>{display}</p>
       <p className="text-xs text-zinc-600">active duration</p>
