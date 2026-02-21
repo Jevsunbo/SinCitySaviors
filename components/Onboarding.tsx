@@ -54,8 +54,9 @@ function getAceIntro(data: OnboardingData): string {
 export default function Onboarding({ onComplete }: OnboardingProps) {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const savedName = typeof window !== "undefined" ? localStorage.getItem("ace_player_name") ?? "" : "";
   const [data, setData] = useState<OnboardingData>({
-    name: "",
+    name: savedName,
     ageVerified: false,
     budgetLimit: 500,
     timeLimit: 120,
@@ -105,7 +106,9 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
         {step === 1 && (
           <div className="space-y-6">
             <div>
-              <h1 className="text-2xl font-bold text-white">Welcome to Sin City Saviors</h1>
+              <h1 className="text-2xl font-bold text-white">
+                {savedName ? `Welcome back, ${savedName}!` : "Welcome to Sin City Saviors"}
+              </h1>
               <p className="mt-1 text-zinc-400">Let's get you set up before you play.</p>
             </div>
 
@@ -163,7 +166,10 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
             </div>
 
             <button
-              onClick={() => setStep(2)}
+              onClick={() => {
+                localStorage.setItem("ace_player_name", data.name);
+                setStep(2);
+              }}
               disabled={!data.name || !data.ageVerified}
               className="w-full rounded-xl bg-indigo-600 py-3 font-semibold text-white transition hover:bg-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed"
             >
