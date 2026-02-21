@@ -8,7 +8,7 @@ Built for hackathon 2026 · Powered by [Claude](https://anthropic.com)
 
 ## Try it live
 
-**[sincitysaviors.vercel.app](https://sincitysaviors.vercel.app)** ← live demo
+**[sin-city-saviors-q3gsnuy3v-jevsunbos-projects.vercel.app](https://sin-city-saviors-q3gsnuy3v-jevsunbos-projects.vercel.app)** ← live demo
 
 No setup required. Here's how to get started in under a minute:
 
