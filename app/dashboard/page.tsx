@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Dashboard from "@/components/Dashboard";
 import AceChat from "@/components/AceChat";
 import Onboarding from "@/components/Onboarding";
@@ -15,13 +15,22 @@ const DEFAULT_RISK: RiskResult = calculateRisk(createMockSession("normal"));
 
 export default function DashboardPage() {
   const [risk, setRisk] = useState<RiskResult>(DEFAULT_RISK);
-  const [mentalHealth, setMentalHealth] = useState<MentalHealthProfile | null>(null);
+  const [mentalHealth, setMentalHealth] = useState<MentalHealthProfile | null>(() => {
+    if (typeof window === "undefined") return null;
+    const saved = sessionStorage.getItem("ace_mental_health");
+    return saved ? JSON.parse(saved) : null;
+  });
   const [endedSession, setEndedSession] = useState<SessionData | null>(null);
   const [aceTriggered, setAceTriggered] = useState(false);
   const [userAccepted, setUserAccepted] = useState(false);
 
+  function handleOnboardingComplete(profile: MentalHealthProfile) {
+    sessionStorage.setItem("ace_mental_health", JSON.stringify(profile));
+    setMentalHealth(profile);
+  }
+
   if (!mentalHealth) {
-    return <Onboarding onComplete={setMentalHealth} />;
+    return <Onboarding onComplete={handleOnboardingComplete} />;
   }
 
   if (endedSession) {
@@ -44,6 +53,7 @@ export default function DashboardPage() {
           userAccepted,
         }}
         onPlayAgain={() => {
+          sessionStorage.removeItem("ace_mental_health");
           setEndedSession(null);
           setMentalHealth(null);
           setAceTriggered(false);
