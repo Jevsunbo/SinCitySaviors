@@ -196,6 +196,33 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
               </p>
             </div>
 
+            {/* Session settings — shown for returning users */}
+            {isReturning && (
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="mb-1.5 block text-sm text-zinc-400">Budget ($)</label>
+                  <input
+                    type="number"
+                    value={data.budgetLimit}
+                    onChange={(e) => update("budgetLimit", Number(e.target.value))}
+                    min={50}
+                    className="w-full rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-white focus:border-indigo-500 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-sm text-zinc-400">Time limit (min)</label>
+                  <input
+                    type="number"
+                    value={data.timeLimit}
+                    onChange={(e) => update("timeLimit", Number(e.target.value))}
+                    min={30}
+                    max={480}
+                    className="w-full rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-white focus:border-indigo-500 focus:outline-none"
+                  />
+                </div>
+              </div>
+            )}
+
             {/* Mood */}
             <div>
               <p className="mb-3 text-sm font-medium text-zinc-300">How are you feeling today?</p>
