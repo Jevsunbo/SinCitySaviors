@@ -1,3 +1,52 @@
+/**
+ * Risk Engine Configuration
+ *
+ * Thresholds are based on responsible gambling research identifying
+ * the three primary behavioral precursors to problem gambling:
+ * loss chasing, session length, and betting velocity.
+ *
+ * These values are tunable per casino operator and can be refined
+ * with real session data over time.
+ */
+export const RISK_CONFIG = {
+  // Loss chasing: bet size multiplier after a loss to flag as chasing
+  lossChasingMultiplier: 1.5,
+  // Loss chasing: consecutive chasing bets required to trigger
+  lossChasingStreak: 2,
+  // Score weight for loss chasing signal
+  lossChasingScore: 30,
+
+  // Long session: minutes before flagging extended play
+  longSessionMinutes: 90,
+  // Score weight for long session signal
+  longSessionScore: 20,
+
+  // Velocity spike: recent window in minutes
+  velocityRecentWindow: 5,
+  // Velocity spike: baseline comparison window in minutes
+  velocityBaselineWindow: 15,
+  // Velocity spike: rate multiplier to trigger (2x = doubled pace)
+  velocityMultiplier: 2,
+  // Score weight for velocity spike signal
+  velocityScore: 25,
+
+  // Bankroll erosion: % lost within the erosion window to trigger
+  bankrollErosionThreshold: 0.5,
+  // Bankroll erosion: window in minutes to measure erosion
+  bankrollErosionWindow: 30,
+  // Score weight for bankroll erosion signal
+  bankrollErosionScore: 25,
+
+  // Mental health modifiers
+  moodModifier: 15,       // applied when mood === "not_great"
+  stressModifier: 20,     // applied when stress === "very_high"
+  intentModifier: 25,     // applied when intent === "escaping"
+
+  // Risk level thresholds
+  moderateThreshold: 50,
+  highThreshold: 75,
+} as const;
+
 export interface Bet {
   id: string;
   amount: number;
