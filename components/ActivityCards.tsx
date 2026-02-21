@@ -131,13 +131,25 @@ export default function ActivityCards({ risk, onAccept }: ActivityCardsProps) {
               {[2, 1].map((offset) => (
                 <div
                   key={offset}
-                  className="absolute inset-0 rounded-2xl border border-zinc-700 bg-zinc-800 flex items-center justify-center"
+                  className="absolute inset-0 rounded-2xl border-2 border-indigo-900/60 bg-indigo-950 overflow-hidden flex items-center justify-center"
                   style={{
                     transform: `translateY(${offset * 8}px) scale(${1 - offset * 0.04}) rotate(${offset % 2 === 0 ? 2 : -2}deg)`,
                     zIndex: 10 - offset,
                   }}
                 >
-                  <span className="text-6xl text-zinc-700 select-none">♠</span>
+                  {/* Outer frame */}
+                  <div className="absolute inset-3 rounded-xl border border-indigo-700/40 flex items-center justify-center">
+                    {/* Inner frame */}
+                    <div className="absolute inset-2 rounded-lg border border-indigo-600/30 flex items-center justify-center">
+                      {/* Corner spades */}
+                      <span className="absolute top-2 left-2.5 text-sm font-bold text-indigo-400/60 leading-none">♠</span>
+                      <span className="absolute top-2 right-2.5 text-sm font-bold text-indigo-400/60 leading-none">♠</span>
+                      <span className="absolute bottom-2 left-2.5 text-sm font-bold text-indigo-400/60 leading-none rotate-180">♠</span>
+                      <span className="absolute bottom-2 right-2.5 text-sm font-bold text-indigo-400/60 leading-none rotate-180">♠</span>
+                      {/* Center logo */}
+                      <span className="text-8xl text-indigo-500/50 select-none">♠</span>
+                    </div>
+                  </div>
                 </div>
               ))}
 
