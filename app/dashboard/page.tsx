@@ -15,6 +15,7 @@ const DEFAULT_RISK: RiskResult = calculateRisk(createMockSession("normal"));
 
 export default function DashboardPage() {
   const [risk, setRisk] = useState<RiskResult>(DEFAULT_RISK);
+  const [peakRiskScore, setPeakRiskScore] = useState(0);
   const [mentalHealth, setMentalHealth] = useState<MentalHealthProfile | null>(() => {
     if (typeof window === "undefined") return null;
     const saved = sessionStorage.getItem("ace_mental_health");
@@ -47,7 +48,7 @@ export default function DashboardPage() {
           losses,
           amountSpent: Math.max(0, amountSpent),
           initialBankroll: endedSession.initialBankroll,
-          peakRiskScore: risk.score,
+          peakRiskScore: peakRiskScore,
           durationMinutes,
           aceTriggered,
           userAccepted,
@@ -59,6 +60,7 @@ export default function DashboardPage() {
           setAceTriggered(false);
           setUserAccepted(false);
           setRisk(DEFAULT_RISK);
+          setPeakRiskScore(0);
         }}
       />
     );
@@ -133,7 +135,10 @@ export default function DashboardPage() {
           {/* Chart */}
           <div className="lg:col-span-3">
             <Dashboard
-              onRiskUpdate={setRisk}
+              onRiskUpdate={(newRisk) => {
+                setRisk(newRisk);
+                setPeakRiskScore((prev) => Math.max(prev, newRisk.score));
+              }}
               onEndSession={setEndedSession}
               mentalHealth={mentalHealth}
             />

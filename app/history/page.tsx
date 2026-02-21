@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import BackButton from "@/components/BackButton";
+import StartSessionButton from "@/components/StartSessionButton";
 
 function getRating(peakRiskScore: number, userAccepted: boolean) {
   if (peakRiskScore < 50) return { label: "Responsible Player", color: "text-green-400", border: "border-green-500/30", glow: "shadow-green-500/10" };
@@ -64,12 +65,9 @@ export default async function HistoryPage() {
               <h1 className="font-bold tracking-tight">Session History</h1>
             </div>
           </div>
-          <Link
-            href="/dashboard"
-            className="rounded-full bg-indigo-600 px-4 py-1.5 text-sm font-semibold hover:bg-indigo-500 transition"
-          >
+          <StartSessionButton className="rounded-full bg-indigo-600 px-4 py-1.5 text-sm font-semibold hover:bg-indigo-500 transition">
             New Session
-          </Link>
+          </StartSessionButton>
         </div>
       </header>
 
@@ -83,12 +81,9 @@ export default async function HistoryPage() {
             <p className="text-zinc-500 max-w-xs">
               Finish a session on the dashboard and your stats will appear here.
             </p>
-            <Link
-              href="/dashboard"
-              className="mt-2 rounded-xl bg-indigo-600 px-8 py-3 font-semibold hover:bg-indigo-500 transition"
-            >
+            <StartSessionButton className="mt-2 rounded-xl bg-indigo-600 px-8 py-3 font-semibold hover:bg-indigo-500 transition">
               Start your first session
-            </Link>
+            </StartSessionButton>
           </div>
         ) : (
           <>
