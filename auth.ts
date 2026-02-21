@@ -3,6 +3,9 @@ import GitHub from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  pages: {
+    signIn: "/sign-in",
+  },
   providers: [
     GitHub({
       clientId: process.env.AUTH_GITHUB_ID,
