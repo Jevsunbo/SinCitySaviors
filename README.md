@@ -6,6 +6,22 @@ Built for hackathon 2026 · Powered by [Claude](https://anthropic.com)
 
 ---
 
+## Try it live
+
+**[sincitysaviors.vercel.app](https://sincitysaviors.vercel.app)** ← live demo
+
+No setup required. Here's how to get started in under a minute:
+
+1. Click **Start your session →** on the landing page
+2. Enter your name, confirm you're 21+, and click **Continue**
+3. Complete the quick mental health check-in (30 seconds)
+4. On the dashboard, click **⚡ Demo Mode** — it auto-runs a scripted session that escalates from safe → high risk in ~15 seconds
+5. Watch Ace step in when the risk score climbs
+
+**Sign in with Google or GitHub** (optional) to unlock session history — your past sessions, peak risk scores, and Ace interaction stats are saved to your account.
+
+---
+
 ## What it does
 
 Before you play, **Ace** checks in on how you're feeling. While you play, he watches your betting patterns for signs of risk. When the score climbs, he steps in — not with a warning, but with a warm suggestion, like a casino host who's looking out for you.
