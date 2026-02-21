@@ -85,7 +85,7 @@ export default function DashboardPage() {
       <header className="sticky top-0 z-10 border-b border-zinc-800 bg-zinc-950/90 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3.5">
           <div className="flex items-center gap-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-sm font-bold">♠</div>
+            <Link href="/" className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-sm font-bold hover:bg-indigo-500 transition">♠</Link>
             <div>
               <h1 className="text-sm font-bold tracking-tight leading-none">Sin City Saviors</h1>
               <p className="text-xs text-zinc-500 mt-0.5">Responsible Gaming Companion</p>
