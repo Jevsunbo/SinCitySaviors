@@ -132,34 +132,6 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                 />
               </div>
 
-              <div>
-                <label className="mb-1.5 block text-sm text-zinc-400">
-                  Session budget ($)
-                </label>
-                <input
-                  type="number"
-                  value={data.budgetLimit}
-                  onChange={(e) => update("budgetLimit", Number(e.target.value))}
-                  min={50}
-                  className="w-full rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-white focus:border-indigo-500 focus:outline-none"
-                />
-                <p className="mt-1 text-xs text-zinc-600">Ace will watch your spending against this limit</p>
-              </div>
-
-              <div>
-                <label className="mb-1.5 block text-sm text-zinc-400">
-                  Time limit (minutes)
-                </label>
-                <input
-                  type="number"
-                  value={data.timeLimit}
-                  onChange={(e) => update("timeLimit", Number(e.target.value))}
-                  min={30}
-                  max={480}
-                  className="w-full rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-white focus:border-indigo-500 focus:outline-none"
-                />
-              </div>
-
               <label className="flex items-start gap-3 cursor-pointer">
                 <input
                   type="checkbox"
