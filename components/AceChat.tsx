@@ -5,6 +5,7 @@ import { RiskResult } from "@/lib/riskEngine";
 
 interface AceChatProps {
   risk: RiskResult;
+  onTrigger?: () => void;
 }
 
 const LEVEL_STYLES = {
@@ -42,7 +43,7 @@ function TypingDots() {
   );
 }
 
-export default function AceChat({ risk }: AceChatProps) {
+export default function AceChat({ risk, onTrigger }: AceChatProps) {
   const [message, setMessage] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
   const [accepted, setAccepted] = useState(false);
@@ -64,6 +65,7 @@ export default function AceChat({ risk }: AceChatProps) {
     if (escalated) {
       setAccepted(false);
       callAce();
+      onTrigger?.();
     }
 
     prevLevelRef.current = curr;

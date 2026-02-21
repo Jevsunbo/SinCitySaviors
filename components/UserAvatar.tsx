@@ -51,6 +51,13 @@ export default function UserAvatar() {
             >
               Session History
             </Link>
+            <Link
+              href="/resources"
+              onClick={() => setOpen(false)}
+              className="block w-full text-left px-4 py-2.5 text-sm text-zinc-300 hover:bg-zinc-800 transition"
+            >
+              Resources
+            </Link>
             <button
               onClick={() => {
                 localStorage.removeItem("ace_player_name");

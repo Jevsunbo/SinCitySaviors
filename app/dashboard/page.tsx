@@ -141,7 +141,7 @@ export default function DashboardPage() {
 
           {/* Sidebar */}
           <div className="lg:col-span-2 flex flex-col gap-4">
-            <AceChat risk={risk} />
+            <AceChat risk={risk} onTrigger={() => setAceTriggered(true)} />
             <ActivityCards risk={risk} onAccept={() => setUserAccepted(true)} />
 
             {/* Active signals */}
