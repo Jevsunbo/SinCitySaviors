@@ -52,12 +52,13 @@ function getAceIntro(data: OnboardingData): string {
 }
 
 export default function Onboarding({ onComplete }: OnboardingProps) {
-  const [step, setStep] = useState(1);
-  const [loading, setLoading] = useState(false);
   const savedName = typeof window !== "undefined" ? localStorage.getItem("ace_player_name") ?? "" : "";
+  const isReturning = savedName.length > 0;
+  const [step, setStep] = useState(isReturning ? 2 : 1);
+  const [loading, setLoading] = useState(false);
   const [data, setData] = useState<OnboardingData>({
     name: savedName,
-    ageVerified: false,
+    ageVerified: isReturning, // returning users already verified
     budgetLimit: 500,
     timeLimit: 120,
     mood: undefined,
@@ -90,14 +91,21 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
       <div className="w-full max-w-md">
         {/* Progress bar */}
         <div className="mb-8">
-          <div className="flex justify-between text-xs text-zinc-500 mb-2">
-            <span>Step {step} of 3</span>
-            <span>{Math.round((step / 3) * 100)}%</span>
-          </div>
+          {isReturning ? (
+            <div className="flex justify-between text-xs text-zinc-500 mb-2">
+              <span>Step {step - 1} of 2</span>
+              <span>{Math.round(((step - 1) / 2) * 100)}%</span>
+            </div>
+          ) : (
+            <div className="flex justify-between text-xs text-zinc-500 mb-2">
+              <span>Step {step} of 3</span>
+              <span>{Math.round((step / 3) * 100)}%</span>
+            </div>
+          )}
           <div className="h-1 w-full rounded-full bg-zinc-800">
             <div
               className="h-1 rounded-full bg-indigo-500 transition-all duration-500"
-              style={{ width: `${(step / 3) * 100}%` }}
+              style={{ width: isReturning ? `${((step - 1) / 2) * 100}%` : `${(step / 3) * 100}%` }}
             />
           </div>
         </div>
@@ -252,12 +260,14 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
             </div>
 
             <div className="flex gap-3">
-              <button
-                onClick={() => setStep(1)}
-                className="rounded-xl border border-zinc-700 px-5 py-3 text-sm text-zinc-400 hover:bg-zinc-800 transition"
-              >
-                Back
-              </button>
+              {!isReturning && (
+                <button
+                  onClick={() => setStep(1)}
+                  className="rounded-xl border border-zinc-700 px-5 py-3 text-sm text-zinc-400 hover:bg-zinc-800 transition"
+                >
+                  Back
+                </button>
+              )}
               <button
                 onClick={() => setStep(3)}
                 disabled={!data.mood || !data.stress || !data.intent}
