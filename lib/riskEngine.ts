@@ -5,16 +5,24 @@ export interface Bet {
   timestamp: number; // Unix ms
 }
 
+export interface MentalHealthProfile {
+  mood?: "great" | "good" | "okay" | "not_great";
+  stress?: "low" | "moderate" | "high" | "very_high";
+  intent?: "fun" | "celebrating" | "bored" | "escaping";
+}
+
 export interface SessionData {
   bets: Bet[];
   startTime: number; // Unix ms
   initialBankroll: number;
   currentBankroll: number;
+  mentalHealth?: MentalHealthProfile;
 }
 
 export interface RiskResult {
   score: number;
   triggers: string[];
+  mentalHealthModifier: number;
   level: "safe" | "moderate" | "high";
   patternSummary: string;
   sessionDurationMinutes: number;
@@ -80,6 +88,16 @@ function checkBankrollErosion(session: SessionData): boolean {
   return erosionPct >= 0.5;
 }
 
+// Mental health baseline modifiers
+function calculateMentalHealthModifier(profile?: MentalHealthProfile): number {
+  if (!profile) return 0;
+  let modifier = 0;
+  if (profile.mood === "not_great") modifier += 15;
+  if (profile.stress === "very_high") modifier += 20;
+  if (profile.intent === "escaping") modifier += 25;
+  return modifier;
+}
+
 export function calculateRisk(session: SessionData): RiskResult {
   let score = 0;
   const triggers: string[] = [];
@@ -104,6 +122,11 @@ export function calculateRisk(session: SessionData): RiskResult {
     triggers.push("bankroll_erosion");
   }
 
+  // Apply mental health modifier on top of behavioral score
+  const mentalHealthModifier = calculateMentalHealthModifier(session.mentalHealth);
+  if (mentalHealthModifier > 0) triggers.push("mental_health_baseline");
+  score = Math.min(100, score + mentalHealthModifier);
+
   const level: RiskResult["level"] =
     score >= 75 ? "high" : score >= 50 ? "moderate" : "safe";
 
@@ -125,6 +148,7 @@ export function calculateRisk(session: SessionData): RiskResult {
   return {
     score,
     triggers,
+    mentalHealthModifier,
     level,
     patternSummary,
     sessionDurationMinutes,
